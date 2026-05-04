@@ -1,0 +1,11 @@
+{
+  "domain": "fencee",
+  "name": "Fencee Integration",
+  "version": "1.0.0",
+  "documentation": "",
+  "config_flow": true,
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": [],
+  "iot_class": "cloud_polling"
+}
