@@ -2,7 +2,8 @@
   "domain": "fencee",
   "name": "Fencee Integration",
   "version": "1.0.0",
-  "documentation": "",
+  "logo":"logo.png"
+  "documentation": "",  
   "config_flow": true,
   "requirements": [],
   "dependencies": [],
