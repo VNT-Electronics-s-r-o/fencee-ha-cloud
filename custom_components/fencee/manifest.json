@@ -2,7 +2,7 @@
   "domain": "fencee",
   "name": "Fencee Link",
   "version": "1.0.0",
-  "logo":"logo.png"
+  "logo":"logo.png",
   "documentation": "",  
   "config_flow": true,
   "requirements": [],
