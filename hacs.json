@@ -2,5 +2,5 @@
   "name": "Fencee",
   "content_in_root": false,
   "logo": "custom_components/fencee/brand/logo.png",
-  "icon": "brand/icon.png"
+  "icon": "custom_components/fencee/brand/icon.png"
 }

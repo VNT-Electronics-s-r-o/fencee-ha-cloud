@@ -3,7 +3,6 @@
   "name": "Fencee Link",
   "version": "1.0.3",
   "logo": "brand/logo.png",
-  "icon": "brand/icon.png",
   "documentation": "https://github.com/fenceecz/fencee-ha-cloud#readme",
   "config_flow": true,
   "requirements": [],
