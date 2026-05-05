@@ -1,4 +1,6 @@
 {
   "name": "Fencee",
-  "content_in_root": false
+  "content_in_root": false,
+  "logo": "custom_components/fencee/brand/logo.png",
+  "icon": "custom_components/fencee/brand/icon.png"
 }

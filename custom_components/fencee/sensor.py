@@ -1,17 +1,16 @@
 
-from datetime import timedelta
-
-import logging
+from datetime import datetime, timezone
 
 from homeassistant.components.sensor import SensorEntity, SensorDeviceClass, SensorStateClass
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, CoordinatorEntity
+from homeassistant.helpers.update_coordinator import (
+    CoordinatorEntity,
+)
 
-_LOGGER = logging.getLogger(__name__)
-
-DOMAIN = "fencee"
+from . import DATA_COORDINATOR, DOMAIN
+from .types import get_allowed_sensors
 
 SENSORS = {
+    "createdAt": ("Aktualizace", None),
     "voltageFence": ("Napeti na ohrade", "V"),
     "voltageBattery": ("Baterie", "%"),
     "energyFence": ("Energie", "%"),
@@ -21,41 +20,35 @@ SENSORS = {
     "powerOutput": ("Nastaveny maximalni vykon", "%"),
 }
 
-HOSTS = {
-    "fencee": "16.60.164.227",
-    "voss": "16.60.164.227",
+DEVICE_CLASSES = {
+    "createdAt": SensorDeviceClass.TIMESTAMP,
+    "voltageFence": SensorDeviceClass.VOLTAGE,
+    "voltageBattery": SensorDeviceClass.BATTERY,
+    "voltageFenceLowTreshold": SensorDeviceClass.VOLTAGE,
+}
+
+MEASUREMENT_KEYS = {
+    "voltageFence",
+    "voltageBattery",
+    "energyFence",
+    "impedance",
+    "voltageFenceLowTreshold",
+    "signal",
+    "powerOutput",
 }
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
-    session = async_get_clientsession(hass)
-
     name = config_entry.data["name"]
     mac = config_entry.data["mac"].lower()
-    token = config_entry.data["token"]
-    brand = config_entry.data["brand"]
+    device_type = config_entry.data.get("device_type", "edc")
+    coordinator = hass.data[DOMAIN][config_entry.entry_id][DATA_COORDINATOR]
 
-    host = HOSTS.get(brand)
-
-    url = f"http://{host}:5000/api/v1/device/last-value?token={token}&mac={mac}"
-
-    async def async_update_data():
-        async with session.get(url) as resp:
-            return await resp.json()
-
-    coordinator = DataUpdateCoordinator(
-        hass,
-        _LOGGER,
-        name=f"fencee_{mac}",
-        update_method=async_update_data,
-        update_interval=timedelta(seconds=60),
-    )
-
-    await coordinator.async_config_entry_first_refresh()
-
+    allowed_sensors = get_allowed_sensors(device_type)
     entities = []
-    data = coordinator.data.get("data", {})
 
-    for key in data.keys():
+    for key in SENSORS:
+        if key not in allowed_sensors:
+            continue
         sensor_name, unit = SENSORS.get(key, (key, None))
         entities.append(FenceeSensor(coordinator, name, mac, key, sensor_name, unit))
 
@@ -81,7 +74,12 @@ class FenceeSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def native_value(self):
-        return self.coordinator.data.get("data", {}).get(self._key)
+        value = self.coordinator.data.get("data", {}).get(self._key)
+        if self._key == "createdAt":
+            if isinstance(value, (int, float)):
+                return datetime.fromtimestamp(value, tz=timezone.utc)
+            return None
+        return value
 
     @property
     def native_unit_of_measurement(self):
@@ -89,23 +87,13 @@ class FenceeSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def state_class(self):
-        return SensorStateClass.MEASUREMENT
+        if self._key in MEASUREMENT_KEYS:
+            return SensorStateClass.MEASUREMENT
+        return None
 
     @property
     def device_class(self):
-        if self._key == "voltageFence":
-            return SensorDeviceClass.VOLTAGE
-
-        if self._key == "voltageBattery":
-            return SensorDeviceClass.BATTERY
-
-        if self._key == "voltageFenceLowTreshold":
-            return SensorDeviceClass.VOLTAGE
-
-        if self._key == "energyFence":           
-            return SensorDeviceClass.PERCENTAGE
-
-        return None
+        return DEVICE_CLASSES.get(self._key)
 
     @property
     def device_info(self):
