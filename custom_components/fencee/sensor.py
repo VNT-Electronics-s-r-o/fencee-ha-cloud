@@ -8,7 +8,7 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from . import DATA_COORDINATOR, DOMAIN
-from .types import get_allowed_sensors
+from .types import get_allowed_sensors, get_unit_overrides
 
 SENSORS = {
     "createdAt": ("Poslední aktualizace", None),
@@ -20,12 +20,18 @@ SENSORS = {
     "voltageFenceLowTreshold":("Threshold", "V"),
     "signal": ("Signal", "%"),
     "powerOutput": ("Nastaveny maximalni vykon", "%"),
+    "state": ("Stav", None),
+}
+
+STATE_MAP = {
+    0: "OFF",
+    1: "Standby",
+    2: "ON",
 }
 
 DEVICE_CLASSES = {
     "createdAt": SensorDeviceClass.TIMESTAMP,
     "voltageFence": SensorDeviceClass.VOLTAGE,
-    "voltageBattery": SensorDeviceClass.BATTERY,
     "voltageFenceLowTreshold": SensorDeviceClass.VOLTAGE,
 }
 
@@ -46,12 +52,14 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     coordinator = hass.data[DOMAIN][config_entry.entry_id][DATA_COORDINATOR]
 
     allowed_sensors = get_allowed_sensors(device_type)
+    unit_overrides = get_unit_overrides(device_type)
     entities = []
 
     for key in SENSORS:
         if key not in allowed_sensors:
             continue
         sensor_name, unit = SENSORS.get(key, (key, None))
+        unit = unit_overrides.get(key, unit)
         entities.append(FenceeSensor(coordinator, name, mac, key, sensor_name, unit))
 
     async_add_entities(entities)
@@ -81,6 +89,10 @@ class FenceeSensor(CoordinatorEntity, SensorEntity):
             if isinstance(value, (int, float)):
                 return datetime.fromtimestamp(value, tz=timezone.utc)
             return None
+        if self._key == "state":
+            return STATE_MAP.get(value, value)
+        if value is None and self._unit is not None:
+            return 0
         return value
 
     @property
@@ -95,7 +107,14 @@ class FenceeSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def device_class(self):
-        return DEVICE_CLASSES.get(self._key)
+        dc = DEVICE_CLASSES.get(self._key)
+        if dc:
+            return dc
+        if self._key == "voltageBattery":
+            if self._unit == "V":
+                return SensorDeviceClass.VOLTAGE
+            return SensorDeviceClass.BATTERY
+        return None
 
     @property
     def device_info(self):

@@ -8,9 +8,11 @@ DEVICE_TYPES = {
             "voltageBattery",
             "voltageFenceLowTreshold",
             "signal",
-            
         },
         "faults": True,
+        "units": {
+            "voltageBattery": "%",
+        },
     },
     "edc": {
         "name": "EDC",
@@ -24,8 +26,12 @@ DEVICE_TYPES = {
             "voltageFenceLowTreshold",
             "signal",
             "powerOutput",
+            "state",
         },
         "faults": True,
+        "units": {
+            "voltageBattery": "V",
+        },
     },
 }
 
@@ -40,6 +46,13 @@ def get_allowed_sensors(device_type: str):
     if device_type not in DEVICE_TYPES:
         return DEVICE_TYPES["edc"]["sensors"]
     return DEVICE_TYPES[device_type]["sensors"]
+
+
+def get_unit_overrides(device_type: str):
+    """Return dict of unit overrides for device type."""
+    if device_type not in DEVICE_TYPES:
+        return {}
+    return DEVICE_TYPES[device_type].get("units", {})
 
 
 def has_faults(device_type: str):
