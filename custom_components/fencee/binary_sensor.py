@@ -12,7 +12,7 @@ from .types import has_faults
 
 def _fault_name(key: str) -> str:
     label = key.replace("alarm_", "").replace("_", " ")
-    return label.capitalize()
+    return "Porucha: " + label.capitalize()
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
@@ -33,17 +33,18 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
     faults = coordinator.data.get("data", {}).get("faults", {})
     if isinstance(faults, dict):
-        for fault_key in faults:
-            entities.append(
-                FenceeBinarySensor(
-                    coordinator,
-                    name,
-                    mac,
-                    fault_key,
-                    _fault_name(fault_key),
-                    parent_key="faults",
+        for fault_key, fault_value in faults.items():
+            if fault_value:
+                entities.append(
+                    FenceeBinarySensor(
+                        coordinator,
+                        name,
+                        mac,
+                        fault_key,
+                        _fault_name(fault_key),
+                        parent_key="faults",
+                    )
                 )
-            )
 
     async_add_entities(entities)
 

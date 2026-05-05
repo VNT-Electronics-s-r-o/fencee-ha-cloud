@@ -1,5 +1,4 @@
 
-from datetime import datetime, timezone
 
 from homeassistant.components.sensor import SensorEntity, SensorDeviceClass, SensorStateClass
 from homeassistant.helpers.update_coordinator import (
@@ -10,7 +9,7 @@ from . import DATA_COORDINATOR, DOMAIN
 from .types import get_allowed_sensors
 
 SENSORS = {
-    "createdAt": ("Aktualizace", None),
+    "createdAt": ("Poslední aktualizace", None),
     "voltageFence": ("Napeti na ohrade", "V"),
     "voltageBattery": ("Baterie", "%"),
     "energyFence": ("Energie", "%"),
@@ -77,7 +76,7 @@ class FenceeSensor(CoordinatorEntity, SensorEntity):
         value = self.coordinator.data.get("data", {}).get(self._key)
         if self._key == "createdAt":
             if isinstance(value, (int, float)):
-                return datetime.fromtimestamp(value, tz=timezone.utc)
+                return value
             return None
         return value
 
