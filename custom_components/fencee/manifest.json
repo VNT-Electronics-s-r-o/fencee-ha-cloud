@@ -1,7 +1,7 @@
 {
   "domain": "fencee",
   "name": "Fencee Link",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "logo": "brand/logo.png",
   "documentation": "https://github.com/fenceecz/fencee-ha-cloud#readme",
   "config_flow": true,
