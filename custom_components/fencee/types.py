@@ -2,11 +2,13 @@ DEVICE_TYPES = {
     "mc20": {
         "name": "MC20",
         "sensors": {
+            "createdAt",
+            "packetId",
             "voltageFence",
             "voltageBattery",
             "voltageFenceLowTreshold",
             "signal",
-            "createdAt",
+            
         },
         "faults": True,
     },
@@ -14,6 +16,7 @@ DEVICE_TYPES = {
         "name": "EDC",
         "sensors": {
             "createdAt",
+            "packetId",
             "voltageFence",
             "voltageBattery",
             "energyFence",
