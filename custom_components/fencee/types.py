@@ -28,6 +28,7 @@ DEVICE_TYPES = {
 
 
 def get_device_type_options():
+    """Return dict of device type keys and names for display."""
     return {key: info["name"] for key, info in DEVICE_TYPES.items()}
 
 
