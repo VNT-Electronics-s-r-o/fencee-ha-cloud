@@ -34,7 +34,7 @@ def get_device_type_options():
 def get_allowed_sensors(device_type: str):
     """Return set of sensor keys allowed for device type."""
     if device_type not in DEVICE_TYPES:
-        return set(DEVICE_TYPES.values())[0]["sensors"]
+        return DEVICE_TYPES["edc"]["sensors"]
     return DEVICE_TYPES[device_type]["sensors"]
 
 
