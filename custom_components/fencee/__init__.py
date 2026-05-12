@@ -14,8 +14,8 @@ MIN_UPDATE_INTERVAL = 60
 MAX_UPDATE_INTERVAL = 86400
 
 HOSTS = {
-    "fencee": "16.60.164.227",
-    "voss": "16.60.164.227",
+    "fencee": "ha-dev.fenceelink.com",
+    "voss": "ha-dev.fenceelink.com",
 }
 
 _LOGGER = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ async def async_setup_entry(hass, entry):
     )
 
     host = HOSTS.get(brand)
-    url = f"http://{host}:5000/api/v1/device/last-value?token={token}&mac={mac}"
+    url = f"https://{host}/api/v1/device/last-value?token={token}&mac={mac}"
 
     async def async_update_data():
         try:
