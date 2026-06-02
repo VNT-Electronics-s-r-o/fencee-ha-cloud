@@ -33,6 +33,23 @@ DEVICE_TYPES = {
             "voltageBattery": "V",
         },
     },
+    "pdc50": {
+        "name": "PDC50",
+        "sensors": {
+            "createdAt",
+            "packetId",
+            "voltageFence",
+            "voltageBattery",
+            "voltageFenceLowTreshold",
+            "signal",
+            "powerOutput",
+            "state",
+        },
+        "faults": True,
+        "units": {
+            "voltageBattery": "V",
+        },
+    },
 }
 
 
