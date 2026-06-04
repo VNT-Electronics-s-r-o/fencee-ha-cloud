@@ -88,6 +88,12 @@ class FenceeBinarySensor(CoordinatorEntity, BinarySensorEntity):
     @property
     def device_class(self):
         return BinarySensorDeviceClass.PROBLEM
+    
+    @property
+    def icon(self):
+        if self.is_on:
+            return "mdi:alert-circle"
+        return "mdi:check-circle"
 
     @property
     def device_info(self):
